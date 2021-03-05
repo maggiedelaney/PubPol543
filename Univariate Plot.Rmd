@@ -1,0 +1,77 @@
+---
+title: "univariate plot"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+```{r}
+link= "https://github.com/maggiedelaney/NigeriaData/raw/main/NGA_2020_NLPS_v06_M_CSV/r1_sect_2.csv"
+NigeriaData = read.csv(link)
+```
+```{r}
+summary(NigeriaData$sector)
+absoluteT=table(NigeriaData$sector,
+                exclude = '') 
+```
+```{r}
+absoluteT
+prop.table(absoluteT)
+ToPlot=prop.table(absoluteT)*100
+ToPlot
+```
+```{r}
+tableFreq=as.data.frame(ToPlot)
+names(tableFreq)=c("Sector","Percent")
+tableFreq
+library(ggplot2)
+base = ggplot(data = tableFreq,
+              aes(x = Sector,
+                  y = Percent))
+plot1 = base + geom_bar(stat = "identity",
+                        fill = " light blue",
+                        color = "dark blue" ,
+                        width = 0.5)
+                        
+plot1
+```
+```{r}
+
+titleText='Household Sector Location'
+sourceText='Source: The World Bank'
+
+plot2 = plot1 + labs(title=titleText,
+                  caption = sourceText)
+plot2
+
+head(tableFreq$Sector)
+```
+```{r}
+plot3= plot2 + xlab("Type of Sector") + ylab("Percent of Population")
+plot3
+```
+```{r}
+plot4 = plot3 + scale_x_discrete(labels=c("1. Urban" = "Urban", "2. Rural" = "Rural"))
+plot4
+```
+```{r}
+library("scales")
+scales::percent(tableFreq$Percent) 
+paste0(round(tableFreq$Percent,2), '%')
+LABELS=paste0(round(tableFreq$Percent,2), '%')
+plot5 = plot4 + geom_text(vjust=6, #hjust if flipping
+                          size = 5,
+                          aes(y = Percent ,
+                              label = LABELS))
+plot5
+
+
+```
+

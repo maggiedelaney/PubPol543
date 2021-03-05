@@ -1,0 +1,81 @@
+---
+title: "Bivariate Plot2.0"
+output: html_document
+---
+
+```{r}
+link="https://github.com/adam-porton/PubPol543/raw/main/Data/r1_sect_a_3_4_5_6_8_9_12.csv"
+NigeriaData = read.csv(link)
+
+sectorNone=table(NigeriaData$sector,NigeriaData$s3q3__11)
+```
+```{r}
+library(magrittr)
+(NigeriaDatamgCol=prop.table(sectorNone,
+                            margin = 2)%>%round(.,3))
+NigeriaDatamgCol = NigeriaDatamgCol*100
+NigeriaDatamgCol
+SectorNoneDF=as.data.frame(NigeriaDatamgCol)
+names(SectorNoneDF)=c("sector","Response","pctCol")
+
+SectorNoneDF$pctCol=as.data.frame(NigeriaDatamgCol)[,3]
+```
+
+```{r}
+str(NigeriaData$s3q3__11,width = 50,strict.width='cut')
+summary(NigeriaData$sector, NigeriaData$s3q3__11)
+as.numeric(as.factor(NigeriaData$s3q3__11))
+na.rm = TRUE
+(sectorNonemgCol=table(NigeriaData$sector,NigeriaData$s3q3__11))
+sectorNonemgCol=as.data.frame(sectorNone)
+names(sectorNonemgCol)=c("sector","action","pctCol")
+```
+```{r}
+library(ggplot2)
+
+base1=ggplot(data=sectorNonemgCol, 
+             aes(x=action, y=(pctCol/1200*100), 
+                 fill=sector)) # this 'aes' in legend
+
+barDodge= base1 +  geom_bar(stat="identity",
+                            position ='dodge') 
+barDodge
+barDodge + geom_text(position = position_dodge(1),
+                     angle=360,
+                     hjust=1,
+                     aes(label=pctCol/1200*100))
+```
+```{r}
+plot2 = barDodge + xlab(NULL) + ylab("Population")
+plot2
+```
+```{r}
+plot3 = plot2 + scale_x_discrete(labels=c("0" = "Changed Behavior", "1" = "Did Not Change Behavior")) 
+plot3
+```
+```{r}
+plot4 = plot3 + labs(title = "Population Taking Action in Urban and Rural Sectors")
+plot4
+```
+
+```{r}
+plot5 = plot4 + scale_y_continuous(labels = scales::percent_format(scale = 1))
+plot5
+```
+```{r}
+PCTAction = (sectorNonemgCol$pctCol/1200)*100
+paste0(round(PCTAction,2), '%')
+LABELS=paste0(round(PCTAction,2), '%')
+plot6 = plot5 + geom_text(position = position_dodge(1),
+                     angle=360,
+                     vjust=-.5,
+                     hjust=1,
+                     aes(label= LABELS))
+plot6
+```
+```{r}
+plot7 = plot6 + scale_fill_discrete(name="Sectors",
+                         labels=c("Urban", "Rural"))
+plot7
+```
+
